@@ -1,17 +1,52 @@
-import React from 'react'
-import { Box, Button, Grid, Typography } from '@mui/material'
+import React, { useContext, useState } from 'react'
+import { Box, Button, Chip, Grid, Typography } from '@mui/material'
 import { ShopLayout } from '../../components/layouts';
 import { ProductSlide, SizeSelector } from '../../components/products'
 import { ItemCounter } from '@/components/ui';
-import { IProduct } from '../../interfaces/products';
+import { IProduct, ICartProduct, ISize } from '../../interfaces';
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { dbProduct } from '@/database';
+import { CartContext } from '../../context/cart/CartContext';
+import { useRouter } from 'next/router';
 
 interface Props {
     product: IProduct
 }
 
 const ProductPage:NextPage<Props> = ({ product }) => {
+    const { addProduct } = useContext(CartContext)
+    const router = useRouter()
+    const [tempCardProduct, setTempCardProduct] = useState<ICartProduct>({
+        _id: product._id,
+        image: product.images[0],
+        price: product.price,
+        size: undefined,
+        slug: product.slug,
+        title: product.title,
+        gender: product.gender,
+        quantity: 1
+    })
+
+    const selectedSize = (size: ISize) => {
+        setTempCardProduct({
+            ...tempCardProduct,
+            size: size
+        })
+    }
+
+    const onAddProduct = () => {
+        if(!tempCardProduct.size) return
+        console.log(tempCardProduct, 'producto agregado')
+        addProduct(tempCardProduct)
+        router.push(`/cart`)
+    }
+
+    const onUpdateQuantity = (val: number) => {
+        setTempCardProduct((prevVal) => ({
+            ...prevVal,
+            quantity: val
+        }))
+    }
 
     return (
         <>
@@ -35,19 +70,39 @@ const ProductPage:NextPage<Props> = ({ product }) => {
                             <Box sx={{ my: 2 }}>
                                 <Typography variant='subtitle1'>Quantity</Typography>
                                 {/**Item Quantity */}
-                                <ItemCounter />
+                                <ItemCounter
+                                    currentValue={tempCardProduct.quantity}
+                                    updateQuantity={onUpdateQuantity}
+                                    maxValue={ product.inStock > 10 ? 10 : product.inStock }
+                                />
                                 <SizeSelector
                                     sizes={product.sizes}
-                                //    selectedSize={product.sizes[0]}
+                                    selectedSize={tempCardProduct.size}
+                                    onSelectedSize={ (size) => selectedSize(size)}
                                 />
                             </Box>
 
                             {/**Add to cart */}
-                            <Button color='secondary' className='circular-btn'>
-                                Add to cart
-                            </Button>
+                            {
+                                product.inStock
+                                    ? (
+                                    <Button
+                                        color='secondary'
+                                        className='circular-btn'
+                                        onClick={onAddProduct}
+                                    >
+                                        {
+                                                tempCardProduct.size
+                                                    ? 'Add to cart'
+                                                    : 'Choose a size'
+                                        }
+                                    </Button>
+                                        
+                                    ) : (
+                                        <Chip label='No units available' color='error' variant='outlined' />
+                                )
+                            }
 
-                            {/*<Chip label='No units available' color='error' variant='outlined' />*/}
                             {/**Description */}
                             <Box>
                                 <Typography variant='subtitle2'>Description</Typography>

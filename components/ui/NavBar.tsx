@@ -3,7 +3,7 @@ import { AppBar, Badge, Box, Button, IconButton, Toolbar, Typography, Input, Inp
 import NextLink from 'next/link'
 import { ClearOutlined, SearchOutlined, ShoppingCartOutlined } from '@mui/icons-material'
 import { useRouter } from 'next/router'
-import { UiContext } from '@/context'
+import { UiContext, CartContext } from '@/context'
 
 interface Props {
 
@@ -12,6 +12,7 @@ interface Props {
 export const NavBar: FC<Props> = () => {
     const { asPath, push } = useRouter()
     const { isMenuOpen, handleSidebar } = useContext(UiContext)
+    const { numberOfItems } = useContext(CartContext)
     const [searchTerm, setSearchTerm] = useState<string>('')
     const [ isSearchVisible, setSearchVisible] = useState<boolean>(false)
     const onSearchTerm = () => {
@@ -116,7 +117,7 @@ export const NavBar: FC<Props> = () => {
                         href={'/cart'}
                     >
                         <IconButton>
-                            <Badge badgeContent={2} variant='standard' color='secondary'>
+                            <Badge badgeContent={numberOfItems > 9 ? '+9' : numberOfItems} variant='standard' color='secondary'>
                                 <ShoppingCartOutlined />
                             </Badge>
                         </IconButton>
