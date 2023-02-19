@@ -1,48 +1,122 @@
+import React, { useContext, useState } from 'react'
 import { AuthLayout } from '@/components/layouts'
-import { Box, Button, Grid, TextField, Typography } from '@mui/material'
+import { Box, Button, Chip, Grid, TextField, Typography } from '@mui/material'
 import Link from 'next/link'
-import React from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { validation } from '@/utils';
+import { ErrorOutline } from '@mui/icons-material'
+import { AuthContext } from '../../context/auth/AuthContext';
+import { useRouter } from 'next/router'
+
+type FormData = {
+    name: string
+    email: string
+    password: string
+}
 
 const RegisterPage = () => {
+    const router = useRouter()
+    const { registerUser } = useContext(AuthContext)
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>()
+    const [showError, setShowError] = useState<boolean>(false)
+    const [errorMsg, setErrorMsg] = useState<string>('')
+    const onRegisterform = async ( {  name, email, password}: FormData) => {
+        setShowError(false)
+        const response = await registerUser(name, email, password)
+        if (response.hasError === true) {
+            setShowError(true)
+            setErrorMsg(response.message!)
+            setTimeout(() => {
+                setShowError(false)
+            }, 2500)
+        }
+
+        router.replace('/')
+    }
 
     return (
         <AuthLayout
             title='Register Page'
         >
-            <Box sx={{ width: 250, padding: '10px 20px'}}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
+            <form onSubmit={handleSubmit(onRegisterform)}>
+                <Box sx={{ width: 250, padding: '10px 20px'}}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
 
-                        <Typography
-                            variant='h1'
-                            component='h1'
-                            textAlign='center'
-                        >Register Page</Typography>
+                            <Typography
+                                variant='h1'
+                                component='h1'
+                                textAlign='center'
+                            >Register Page</Typography>
+
+                            {
+                                showError && (
+                                    <Chip
+                                        label={errorMsg}
+                                        color='error'
+                                        icon={<ErrorOutline />}
+                                        className='fadeIn'
+                                    />
+                                )
+                            }
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label='Name'
+                                variant='filled'
+                                fullWidth
+                                size='small'
+                                {
+                                ...register('name', {
+                                    required: 'Nmae is required',
+                                    minLength: { value: 3, message: 'Name needs to be 3 characters long'}
+                                })
+                                }
+                                error={!!errors.name}
+                                helperText={errors.name?.message}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField 
+                                label='Email' 
+                                variant='filled' 
+                                type='email'
+                                fullWidth 
+                                size='small'
+                                {...register('email', { required: 'Email is required', validate: validation.isEmail })}
+                                error={!!errors.email}
+                                helperText={errors.email?.message}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label='Password'
+                                type='password'
+                                variant='filled'
+                                fullWidth
+                                size='small'
+                                {...register('password', { required: 'Password is required', minLength: {value: 6, message: 'Password needs to be 6 characters length'}})}
+                                error={!!errors.password}
+                                helperText={errors.password?.message}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                type='submit'
+                                color='secondary'
+                                className='circular-btn'
+                                fullWidth
+                                size='large'
+                            >Register</Button>
+                        </Grid>
+                        <Grid item xs={12} display='flex' justifyContent='end'>
+                            <Link href={'/auth/login'}>
+                                Already a member? Log in
+                            </Link>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField label='Name' variant='filled' fullWidth size='small'/>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField label='Email' variant='filled' fullWidth size='small'/>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField label='Password' type='password' variant='filled' fullWidth size='small' />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button
-                            color='secondary'
-                            className='circular-btn'
-                            fullWidth
-                            size='large'
-                        >Register</Button>
-                    </Grid>
-                    <Grid item xs={12} display='flex' justifyContent='end'>
-                        <Link href={'/auth/login'}>
-                            Already a member? Log in
-                        </Link>
-                    </Grid>
-                </Grid>
-            </Box>
+                </Box>
+            </form>
         </AuthLayout>
     )
 }
