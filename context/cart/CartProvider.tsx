@@ -14,10 +14,6 @@ export interface CartState {
 
 interface Props {
     children: ReactNode
-    numberOfItems: number;
-    subtotal: number;
-    tax: number;
-    total: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
