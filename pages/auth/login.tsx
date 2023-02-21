@@ -30,8 +30,8 @@ const LoginPage = () => {
             }, 2500)
             return
         }
-
-        router.replace('/')
+        const destination = router.query.p?.toString() || '/'
+        router.replace(`/${destination}`)
     }
     return (
         <AuthLayout
@@ -101,7 +101,7 @@ const LoginPage = () => {
                             >Log in</Button>
                         </Grid>
                         <Grid item xs={12} display='flex' justifyContent='end'>
-                            <Link href={'/auth/register'}>
+                            <Link href={ router.query.p ? `/auth/register?=${router.query.p}` : `/auth/register`}>
                                 Don't have an account?
                             </Link>
                         </Grid>
