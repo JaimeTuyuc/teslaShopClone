@@ -1,11 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { CartList, CartSummary } from '@/components/cart'
 import { ShopLayout } from '@/components/layouts'
 import { Box, Button, Card, CardContent, Divider, Grid, Typography } from '@mui/material'
 import Link from 'next/link'
+import { CartContext } from '../../context/cart/CartContext';
+import { countries } from '../../utils/countries';
 
 const SummaryPage = () => {
-
+    
+    const { shippingAddress, cart, numberOfItems } = useContext(CartContext)
+    if (!shippingAddress) {
+        return <></>
+    }
+    const { firstName, lastName, address, address2 = '', phone, zip, city, country } = shippingAddress
         return (
         
         <>
@@ -24,7 +31,7 @@ const SummaryPage = () => {
                     <Grid item xs={12} sm={5}>
                         <Card className='summary-card'>
                             <CardContent>
-                                <Typography variant='h2'>Your Order summary (3 Items)</Typography>
+                                    <Typography variant='h2'>Your Order summary {numberOfItems} {cart.length > 1 ? 'Items' : 'Item'}</Typography>
                                 <Divider sx={{ my: 1 }} />
                                     <Box
                                         display='flex'
@@ -38,10 +45,11 @@ const SummaryPage = () => {
                                         </Link>        
                                     </Box>
                                     <Typography variant='subtitle1'>Edit address of delivery</Typography>
-                                    <Typography>James Tuyuc</Typography>
-                                    <Typography>25 some place</Typography>
-                                    <Typography>Roosevelt st, GT 12458</Typography>
-                                    <Typography>+502 54845784</Typography>
+                                    <Typography>{firstName} {lastName}</Typography>
+                                    <Typography>{address} { address2 ? `, ${address2}`: ''}</Typography>
+                                    <Typography>{city}, {zip}</Typography>
+                                    <Typography>{ countries.find((c) => c.code === country)?.name }</Typography>
+                                    <Typography>{phone}</Typography>
                                     <Divider sx={{ my: 1 }} />
                                     <Box
                                         display='flex'
