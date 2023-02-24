@@ -1,4 +1,4 @@
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useEffect } from 'react'
 import { ShopLayout } from '@/components/layouts'
 import { Box, Button, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { countries } from '@/utils'
@@ -39,9 +39,21 @@ const getAddressFromCookies = ():FormData => {
 const Address:FC<Props> = () => {
     const router = useRouter()
     const { updateAddresCookies } = useContext(CartContext)
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        defaultValues: getAddressFromCookies()
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            address: '',
+            address2: '',
+            zip: '',
+            country: countries.countries[0].code,
+            phone: ''
+        }
     })
+
+    useEffect(() => {
+        reset(getAddressFromCookies())
+    }, [reset])
 
     const handleAddressSubmit = (data: FormData) => {
         updateAddresCookies(data)

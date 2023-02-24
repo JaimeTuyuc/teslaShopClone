@@ -1,6 +1,6 @@
 
-import { IRole } from '@/interfaces'
 import { FC, ReactNode, useEffect, useReducer } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { AuthContext, authReducer } from './'
 import { IUser } from '../../interfaces/users';
 import tesloApi from '../../api/tesloApi';
@@ -24,13 +24,23 @@ const AUTH_INITIAL_STATE: AuthState = {
 
 export const AuthProvider: FC<Props> = ({ children }) => {
 
-    const router = useRouter()
     const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE)
+    const router = useRouter()
+    const { data, status } = useSession()
 
+    // Using next auth
     useEffect(() => {
-        if(!Cookie.get('token')) return
-        checkToken()
-    }, [])
+        if (status === 'authenticated') {
+            //console.log(data.user, 'user data')
+            dispatch({ type: '[AUTH] - login', payload: data.user as IUser})
+        }
+    },[data, status])
+
+    // This uses out custom auth
+    // useEffect(() => {
+    //     if(!Cookie.get('token')) return
+    //     checkToken()
+    // }, [])
     
 
     const checkToken = async () => {
@@ -83,7 +93,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
     }
 
     const logoutHandler = () => {
-        Cookie.remove('token')
+        // Cookie.remove('token')
         Cookie.remove('cart')
         Cookie.remove('firstName')
         Cookie.remove('lastName')
@@ -93,7 +103,10 @@ export const AuthProvider: FC<Props> = ({ children }) => {
         Cookie.remove('city')
         Cookie.remove('country') 
         Cookie.remove('phone')
-        router.reload()
+        
+        signOut()
+        
+        //router.reload()
     }
 
     const values = {
