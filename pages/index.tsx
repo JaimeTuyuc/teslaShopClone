@@ -4,7 +4,6 @@ import { ShopLayout } from '../components/layouts'
 import { ProductList } from '../components/products'
 import { useProducts } from '../hooks'
 
-
 export default function HomePage() {
 
   const { products, isLoading } = useProducts('products')

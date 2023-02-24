@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { GetServerSideProps } from 'next'
 import { AuthLayout } from '@/components/layouts'
 import { Box, Button, Chip, Grid, TextField, Typography } from '@mui/material'
 import Link from 'next/link'
@@ -7,6 +8,7 @@ import { validation } from '@/utils';
 import { ErrorOutline } from '@mui/icons-material'
 import { AuthContext } from '../../context/auth/AuthContext';
 import { useRouter } from 'next/router'
+import { getSession, signIn } from 'next-auth/react'
 
 type FormData = {
     name: string
@@ -32,8 +34,9 @@ const RegisterPage = () => {
         }
 
         // router.replace('/')
-        const destination = router.query.p?.toString() || '/'
-        router.replace(`/${destination}`)
+        //const destination = router.query.p?.toString() || '/'
+        //router.replace(`/${destination}`)
+        await signIn('credentials',{ email: email, password: password });
     }
 
     return (
@@ -123,6 +126,26 @@ const RegisterPage = () => {
             </form>
         </AuthLayout>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({req, query}) => {
+    const session = await getSession({ req })
+    const { p = '/' } = query
+    
+    if (session) {
+        return {
+            redirect: {
+                destination: p.toString(),
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {
+
+        }
+    }
 }
 
 export default RegisterPage
