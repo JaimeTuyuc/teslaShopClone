@@ -3,6 +3,9 @@ import { FC, ReactNode, useEffect, useReducer } from 'react'
 import { CartContext, cartReducer } from './'
 import { ICartProduct } from '../../interfaces/cart';
 import Cookie from 'js-cookie'
+import { IOrder, ShippingAddress } from '@/interfaces/order';
+import { tesloApi } from '@/api';
+import axios from 'axios';
 
 export interface CartState {
     isLoaded: boolean;
@@ -18,16 +21,7 @@ interface Props {
     children: ReactNode
 }
 
-export interface ShippingAddress {
-        firstName: string
-        lastName: string
-        address: string
-        address2?: string
-        zip: string
-        city: string
-        country: string
-        phone: string
-    }
+
 
 const CART_INITIAL_STATE: CartState = {
     isLoaded: false,
@@ -45,7 +39,10 @@ export const CartProvider: FC<Props> = ({ children }) => {
 
     useEffect(() => {
         try {
-            const productsCookie = Cookie.get('cart') ? JSON.parse(Cookie.get('cart')!) : []
+            const productsCookie = JSON.parse(Cookie.get('cart')!)
+            //const dataFromLocalStorage = JSON.parse(localStorage.getItem('cartStorage'))
+            //console.log(dataFromLocalStorage, 'from localstorage?')
+            console.log(productsCookie, 'cart de cookies*-*-*-*ß')
             dispatch({ type: '[CART] - loadCart from cookies | storage', payload: productsCookie })
         } catch (error) {
             dispatch({ type: '[CART] - loadCart from cookies | storage', payload: [] })
@@ -70,7 +67,13 @@ export const CartProvider: FC<Props> = ({ children }) => {
     },[])
 
     useEffect(() => {
+        //console.log(state.cart, 'cart actualizado')
+        // Save to cookies and Localstorage
         Cookie.set('cart', JSON.stringify(state.cart))
+
+        //localStorage.setItem('cartStorage', JSON.stringify(state.cart))
+        //localStorage.setItem('test', 'Hola desde local storage')
+        //console.log('Just a test to see if this is working')
     }, [state.cart])
     
     useEffect(() => {
@@ -134,6 +137,50 @@ export const CartProvider: FC<Props> = ({ children }) => {
         dispatch({ type: '[CART] - update address', payload: address})
     }
 
+    const createOrder = async (): Promise<{ hasError: boolean; message: string }> => {
+
+        if (!state.shippingAddress) {
+            throw new Error('No address provided')
+        }
+
+        const body: IOrder = {
+            orderItems: state.cart.map((p) => ({
+                ...p,
+                size: p.size!
+            })),
+            shippingAddress: state.shippingAddress,
+            numberOfItems: state.numberOfItems,
+            subTotal: state.subtotal,
+            tax: state.tax,
+            total: state.total,
+            isPaid: false,
+        }
+
+        try {
+            
+            const { data } = await tesloApi.post<IOrder>(`/orders`, body)
+            dispatch({ type: '[CART] - Order complete'})
+            return {
+                hasError: false,
+                message: data._id!
+            }
+
+        } catch (error) {
+            console.log(error, 'unable to create the order')
+            if (axios.isAxiosError(error)) {
+                return {
+                    hasError: true,
+                    message: error.response?.data.message
+                }
+            }
+
+            return {
+                hasError: true,
+                message: 'Unable to complete the request, please contant your administrator'
+            }
+        }
+    }
+
     const values = {
         ...state,
 
@@ -141,7 +188,8 @@ export const CartProvider: FC<Props> = ({ children }) => {
         addProduct,
         updateCartQuantity,
         removeCartProduct,
-        updateAddresCookies
+        updateAddresCookies,
+        createOrder
     }
 
     return (

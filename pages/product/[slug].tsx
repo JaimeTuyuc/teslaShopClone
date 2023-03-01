@@ -36,7 +36,6 @@ const ProductPage:NextPage<Props> = ({ product }) => {
 
     const onAddProduct = () => {
         if(!tempCardProduct.size) return
-        console.log(tempCardProduct, 'producto agregado')
         addProduct(tempCardProduct)
         router.push(`/cart`)
     }

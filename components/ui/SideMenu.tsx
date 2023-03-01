@@ -72,7 +72,10 @@ export const SideMenu = () => {
                                     <ListItemText primary={'Profile'} />
                                 </ListItem>
 
-                                <ListItem button>
+                                <ListItem
+                                    button
+                                    onClick={ () => navigateTo(`/orders/history`)}
+                                >
                                     <ListItemIcon>
                                         <ConfirmationNumberOutlined />
                                     </ListItemIcon>
@@ -166,7 +169,7 @@ export const SideMenu = () => {
                                     </ListItemIcon>
                                     <ListItemText primary={'Products'} />
                                 </ListItem>
-                                <ListItem button>
+                                <ListItem button >
                                     <ListItemIcon>
                                         <ConfirmationNumberOutlined />
                                     </ListItemIcon>
