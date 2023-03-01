@@ -3,6 +3,10 @@ import { Chip, Grid, Typography } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import React from 'react'
 import Link from 'next/link';
+import { GetServerSideProps, NextPage } from 'next';
+import { getSession } from 'next-auth/react';
+import { dbOrder } from '@/database';
+import { IOrder } from '../../interfaces/order';
 
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
@@ -34,7 +38,7 @@ const columns: GridColDef[] = [
     }
 ]
 
-const rows = [
+/*const rows = [
     { id: 1, paid: true, fullName: 'James Tuyuc 0', orderId: 'sdfajsad4f53aefa3' },
     { id: 2, paid: false, fullName: 'James Tuyuc 1', orderId: 'sdfajsad4f53aefa3' },
     { id: 3, paid: true, fullName: 'James Tuyuc 2', orderId: 'sdfajsad4f53aefa3' },
@@ -46,9 +50,21 @@ const rows = [
     { id: 9, paid: true, fullName: 'James Tuyuc 8', orderId: 'sdfajsad4f53aefa3' },
     { id: 10, paid: false, fullName: 'James Tuyuc 9', orderId: 'sdfajsad4f53aefa3' },
     {id: 11, paid: true, fullName: 'James Tuyuc 10', orderId: 'sdfajsad4f53aefa3' }
-]
+]*/
 
-const HistoryPage = () => {
+interface Props {
+    orders: IOrder[]
+}
+
+const HistoryPage:NextPage<Props> = ({ orders }) => {
+
+    const rows = orders.map((order, idx) => ({
+        id: idx + 1,
+        paid: order.isPaid,
+        fullName: order.shippingAddress.firstName + order.shippingAddress.lastName,
+        orderId: order._id
+    }))
+
     return (
         <>
             <ShopLayout
@@ -71,5 +87,26 @@ const HistoryPage = () => {
         </>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+    
+    const session: any = await getSession({req})
+    if (!session) {
+        return {
+            redirect: {
+                destination: `/auth/login?p=/orders/history`,
+                permanent: false
+            }
+        }
+    }
+
+    const orders = await dbOrder.getOrdersByuser(session.user._id)
+
+    return {
+        props: {
+            orders
+        }
+    }
+} 
 
 export default HistoryPage

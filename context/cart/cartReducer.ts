@@ -1,7 +1,7 @@
 
 import { CartState } from './'
 import { ICartProduct } from '../../interfaces/cart';
-import { ShippingAddress } from './CartProvider';
+import { ShippingAddress } from '@/interfaces/order';
 
 type CartActionType =
     | { type: '[CART] - loadCart from cookies | storage', payload: ICartProduct[] }
@@ -16,7 +16,9 @@ type CartActionType =
         subtotal: number;
         tax: number;
         total: number;
-    }}
+        }
+    }
+    | { type: '[CART] - Order complete' }
     
 export const cartReducer = (state: CartState, action: CartActionType): CartState => {
     
@@ -28,6 +30,7 @@ export const cartReducer = (state: CartState, action: CartActionType): CartState
                 cart: [...action.payload]
             }
         case '[CART] - add product':
+            //localStorage.setItem('cartStorage', JSON.stringify(action.payload))
             return {
                 ...state,
                 cart: [...action.payload]
@@ -63,6 +66,15 @@ export const cartReducer = (state: CartState, action: CartActionType): CartState
             return {
                 ...state,
                 shippingAddress: action.payload
+            }
+        case '[CART] - Order complete':
+            return {
+                ...state,
+                cart: [],
+                numberOfItems: 0,
+                subtotal: 0,
+                tax: 0,
+                total: 0
             }
         default:
             return state

@@ -8,3 +8,5 @@ export * from './constants'
 export * as dbProduct from './dbProducts'
 
 export * as dbUsers from './dbUsers'
+
+export * as dbOrder from './dbOrders'
