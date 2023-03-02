@@ -123,13 +123,13 @@ const LoginPage = () => {
                             <Divider sx={{ width: '100%', mb: 2 }} />
                             
                             {
-                                Object.values(providers).map((provider: any) => {
+                                Object.values(providers).map((provider: any, idx:number) => {
                                     
-                                    if(provider.id === 'credentials') return <div key={'credentials'}></div>
+                                    if(provider.id === 'credentials') return <div key={idx}></div>
                                     
                                     return (
                                         <Button
-                                            key={provider.key}
+                                            key={idx}
                                             variant='outlined'
                                             fullWidth
                                             color='primary'
