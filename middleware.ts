@@ -4,14 +4,38 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req: NextRequest) {
 
-    const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const session: any = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     if (!session) {
         const requestedPage = req.nextUrl.pathname;
         const url = req.nextUrl.clone();
         url.pathname = `/auth/login`;
         url.search = `p=${requestedPage}`;
+        console.log(url, 'que se envia')
         return NextResponse.redirect(url);
+        /*
+        return new Response(JSON.stringify({ message: 'no authorize' }), {
+            status: 401,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        */
+    }
+
+    const validRoles = ['admin', 'super-user', 'SEO']
+
+    if (!validRoles.includes(session.user.role)) {
+        return NextResponse.redirect(new URL('/', req.url));
+
+        /*
+            return new Response(JSON.stringify({ message: 'no authorize' }), {
+            status: 401,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        */
     }
 
     return NextResponse.next();
@@ -20,7 +44,7 @@ export async function middleware(req: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/checkout/address', '/checkout/summary']
+    matcher: ['/checkout/address', '/checkout/summary', '/admin']
 };
 
 /*
