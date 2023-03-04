@@ -3,7 +3,7 @@ import mongoose, { Schema, Model, model } from "mongoose"
 
 
 const productSchema = new Schema({
-    description: { type: String, required: true},
+    description: { type: String, required: true, default: ''},
     images: [{ type: String }],
     inStock: { type: Number, requred: true },
     price: { type: Number, requred: true, default: 0 },
@@ -17,20 +17,22 @@ const productSchema = new Schema({
     }],
     slug: { type: String, required: true, unique: true },
     tags: [{ type: String }],
-    title: { type: String, required: true },
+    title: { type: String, required: true, default: '' },
     type: [{
         type: String,
         enum: {
             values: ['shirts', 'pants', 'hoodies', 'hats'],
             message: 'Enter a valid type'
-        }
+        },
+        default: 'shirts'
     }],
     gender: [{
         type: String,
         enum: {
             values: ['men', 'women', 'kid', 'unisex'],
             message: 'Invalid gender type'
-        }
+        },
+        default: 'women'
     }]
 }, {
     timestamps: true
