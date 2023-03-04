@@ -21,15 +21,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
 const getProductBySlug = async (req: NextApiRequest, res: NextApiResponse) => {
     const { slug } = req.query
-    console.log(slug, 'slug')
+    //console.log(slug, 'slug')
 
     await db.connect()
-    const productFound = await Product.findOne({slug}).lean()
+    let productFound = await Product.findOne({slug}).lean()
     await db.disconnect()
 
     if (!productFound) {
         res.status(404).json({ message: 'No producto found with that slug'})
     }
+
+    productFound!.images = productFound!.images.map((image) => {
+        return image.includes('http') ? image : `${process.env.HOST_NAME}products/${image}`
+    })
 
     return res.status(200).json(productFound)
 }
