@@ -33,7 +33,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
 const regisetUserHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     
     const { name = '', email = '', password = '' } = req.body as {name: string, email: string, password: string }
-    console.log(email, 'desde el backend')
+    // console.log(email, 'desde el backend')
     if (!validation.isValidEmail(email)) {
         return res.status(400).json({ message: 'Invalid email entered'})
     }

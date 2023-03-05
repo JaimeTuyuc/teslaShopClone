@@ -25,7 +25,7 @@ export const checkUserEmailPassword = async (email: string, password: string) =>
 }
 
 export const oAuthToDBUser = async (oAEmail: string, oAname: string) => {
-    console.log(oAEmail, oAname, 'desde el backend')
+    // console.log(oAEmail, oAname, 'desde el backend')
     
     await db.connect()
 
