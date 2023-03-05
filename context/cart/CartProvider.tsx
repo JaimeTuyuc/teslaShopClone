@@ -42,7 +42,7 @@ export const CartProvider: FC<Props> = ({ children }) => {
             const productsCookie = JSON.parse(Cookie.get('cart')!)
             //const dataFromLocalStorage = JSON.parse(localStorage.getItem('cartStorage'))
             //console.log(dataFromLocalStorage, 'from localstorage?')
-            console.log(productsCookie, 'cart de cookies*-*-*-*ß')
+            // console.log(productsCookie, 'cart de cookies*-*-*-*ß')
             dispatch({ type: '[CART] - loadCart from cookies | storage', payload: productsCookie })
         } catch (error) {
             dispatch({ type: '[CART] - loadCart from cookies | storage', payload: [] })

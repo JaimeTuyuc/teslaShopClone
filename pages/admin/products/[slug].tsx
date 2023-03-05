@@ -71,7 +71,7 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
     }
 
     const onSubmit = async ( formData: FormData ) => {
-        console.log(formData, 'datos actualizados?')
+        // console.log(formData, 'datos actualizados?')
         if (formData.images.length < 2) return
         
         setIsSaving(true)
@@ -83,7 +83,7 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
                 data: formData
             })
 
-            console.log(data, 'datos actualizados?*-*-*-*')
+            // console.log(data, 'datos actualizados?*-*-*-*')
 
             if (!formData._id) {
                 // TODO: REVISA??????
@@ -123,7 +123,7 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
                 formData.append('file', file)
                 
                 const { data } = await tesloApi.post(`/admin/upload`, formData)
-                console.log(data, 'datos')
+                //console.log(data, 'datos')
 
                 setValue('images', [...getValues('images'), data.message ], { shouldValidate: true })
             }
